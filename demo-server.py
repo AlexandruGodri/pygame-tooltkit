@@ -2,12 +2,21 @@ import pygslib
 import sys
 import random
 
+
+host = '0.0.0.0'
+if len(sys.argv) >= 2:
+    host = sys.argv[1]
+
+port = 5000
+if len(sys.argv) >= 3:
+    port = int(sys.argv[2])
+
 screen_size = (640, 480)
 screen_background = (0, 0, 0)
 player_size = (32, 32)
 players = {}
 
-server = pygslib.server.Server()
+server = pygslib.server.Server(host=host, port=port)
 
 
 class Player:

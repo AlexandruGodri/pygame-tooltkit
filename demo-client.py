@@ -7,9 +7,17 @@ from Queue import *
 from pygclib.runner import Runner
 
 
+host = '0.0.0.0'
+if len(sys.argv) >= 2:
+    host = sys.argv[1]
+
+port = 5000
+if len(sys.argv) >= 3:
+    port = int(sys.argv[2])
+
 q = Queue()
 
-client = pygclib.client.Client(queue=q)
+client = pygclib.client.Client(queue=q, host=host, port=port)
 game_instance = None
 player_sprite = None
 players = {}
