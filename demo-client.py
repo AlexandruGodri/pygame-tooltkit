@@ -1,4 +1,5 @@
 import os
+import json
 import sys
 import pygclib
 import game
@@ -7,7 +8,7 @@ from Queue import *
 from pygclib.runner import Runner
 
 
-host = '0.0.0.0'
+host = '127.0.0.1'
 if len(sys.argv) >= 2:
     host = sys.argv[1]
 
@@ -46,18 +47,27 @@ def defer_game_init(*args):
     event = args[0]
     data = args[1]
 
-    game_instance.init(data['game']['screen_size'], data['game']['screen_background'])
-    player_sprite = game_instance.create_rectangle(color=data['player']['color'], position=data['player']['position'], size=data['game']['player_size'])
-    players[str(data['client_id'])] = player_sprite
+    print(json.dumps(data, indent=4))
+    sys.stdout.flush()
 
-    other_players = data['other_players']
-    for player_id in other_players:
-        p = other_players[player_id]
-        players[str(player_id)] = game_instance.create_rectangle(color=p['color'], position=p['position'], size=p['size'])
+    try:
+        game_instance.init(data['game']['screen_size'], data['game']['screen_background'])
+        player_sprite = game_instance.create_rectangle(color=data['player']['color'], position=data['player']['position'], size=data['game']['player_size'])
+        players[str(data['client_id'])] = player_sprite
 
-    game_instance.ready()
-    game_instance.run()
+        other_players = data['other_players']
+        for player_id in other_players:
+            p = other_players[player_id]
+            players[str(player_id)] = game_instance.create_rectangle(color=p['color'], position=p['position'], size=p['size'])
 
+        for brick in data['bricks']:
+            game_instance.create_rectangle(color=brick['color'], position=brick['position'], size=brick['size'])
+
+        game_instance.ready()
+        game_instance.run()
+    except Exception as e:
+        print 'aa', e
+        sys.stdout.flush()
 
 def handle_game_init(*args):
     Runner(callback=defer_game_init, args=args).start()
